@@ -18,6 +18,8 @@ Downloaded releases are not notarized. The generated cask preserves quarantine m
 
 `Casks/snapper.rb.in` is the source template. `build.sh` fills in the version and exact ZIP checksum to produce `build/snapper.rb`. There is no placeholder checksum in an installable cask and no separate version number to keep synchronized. See the [Homebrew Cask Cookbook](https://docs.brew.sh/Cask-Cookbook).
 
+The workflow selects Xcode 26.3 so release builds include Liquid Glass support. A manual workflow run can rebuild an existing tag; this replaces its assets, so refresh the tap checksum if the archive changes. Once a version is distributed through Homebrew, publish a new version for further changes.
+
 The one-time change from `com.snapper.Snapper` to `com.nikhilweee.snapper` requires granting Accessibility access again; JSON files remain in place. Rebuilding an ad hoc signed app may also require regranting permission.
 
 ## Generated files

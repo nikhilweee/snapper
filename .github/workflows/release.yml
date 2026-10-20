@@ -3,6 +3,12 @@ name: Release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to build
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -10,19 +16,29 @@ permissions:
 jobs:
   release:
     runs-on: macos-15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.ref }}
       - name: Check version tag
         run: |
           version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resources/Info.plist)
-          if [[ "$GITHUB_REF_NAME" != "v$version" ]]; then
-            echo "Tag $GITHUB_REF_NAME does not match Info.plist version $version."
+          if [[ "$RELEASE_TAG" != "v$version" ]]; then
+            echo "Tag $RELEASE_TAG does not match Info.plist version $version."
             exit 1
           fi
       - run: swift test
       - run: ./build.sh --universal
       - run: ruby -c build/snapper.rb
       - name: Publish release
-        run: gh release create "$GITHUB_REF_NAME" build/Snapper.zip build/snapper.rb --verify-tag --generate-notes
+        run: |
+          if gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" build/Snapper.zip build/snapper.rb --clobber
+          else
+            gh release create "$RELEASE_TAG" build/Snapper.zip build/snapper.rb --verify-tag --generate-notes
+          fi
         env:
           GH_TOKEN: ${{ github.token }}
