@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check version tag
+        run: |
+          version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resources/Info.plist)
+          if [[ "$GITHUB_REF_NAME" != "v$version" ]]; then
+            echo "Tag $GITHUB_REF_NAME does not match Info.plist version $version."
+            exit 1
+          fi
+      - run: swift test
+      - run: ./build.sh --universal
+      - run: ruby -c build/snapper.rb
+      - name: Publish release
+        run: gh release create "$GITHUB_REF_NAME" build/Snapper.zip build/snapper.rb --verify-tag --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

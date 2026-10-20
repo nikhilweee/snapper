@@ -1,0 +1,20 @@
+cask "snapper" do
+  version "@VERSION@"
+  sha256 "@SHA256@"
+
+  url "https://github.com/nikhilweee/snapper/releases/download/v#{version}/Snapper.zip"
+  name "Snapper"
+  desc "Menu bar window snapping with layouts remembered per display"
+  homepage "https://github.com/nikhilweee/snapper"
+
+  depends_on macos: :sonoma
+
+  app "Snapper.app"
+
+  uninstall quit: "com.nikhilweee.snapper"
+
+  zap trash: [
+    "~/Library/Application Support/Snapper",
+    "~/Library/Preferences/com.nikhilweee.snapper.plist",
+  ]
+end
