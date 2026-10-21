@@ -15,15 +15,13 @@ Security → Accessibility** so it can move and resize windows.
 
 ## Install
 
-Install with Homebrew:
-
 ```sh
 brew install --cask nikhilweee/tap/snapper
 ```
 
-Then launch Snapper from /Applications. Releases are ad hoc signed; if macOS
-blocks the first launch, approve Snapper in **System Settings → Privacy & Security
-→ Open Anyway**.
+Then launch Snapper from /Applications. The app is ad-hoc signed (no Apple
+Developer account); the cask clears the quarantine flag after install so
+Gatekeeper doesn't block the first launch.
 
 ## Configuration
 

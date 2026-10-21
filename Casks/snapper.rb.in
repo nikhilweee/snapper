@@ -11,6 +11,13 @@ cask "snapper" do
 
   app "Snapper.app"
 
+  # The app is ad-hoc signed, so a quarantined first launch would hit the
+  # Gatekeeper "could not verify" dialog. Strip just the quarantine flag
+  # after install; the sha256 above still pins the download.
+  postflight_steps do
+    run "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "{{appdir}}/Snapper.app"]
+  end
+
   uninstall quit: "com.nikhilweee.snapper"
 
   zap trash: [
